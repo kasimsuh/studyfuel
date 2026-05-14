@@ -1,18 +1,22 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import profiles, goals, logs
 
-app = FastAPI()
+app = FastAPI(title="StudyFuel API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
-async def root():
-    return {"message": "Hello from the FastAPI backend"}
+app.include_router(profiles.router)
+app.include_router(goals.router)
+app.include_router(logs.router)
 
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
-
-
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}

@@ -1,21 +1,22 @@
 services:
- postgres:
-  image: pgvector/pgvector:pg16
-  container_name: studyfuel_postgres
-  environment:
-    POSTGRES_USER: ${POSTGRES_USER:-postgres}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    POSTGRES_DB: ${POSTGRES_DB:-studyfuel}
-  ports:
-    - "${POSTGRES_PORT:-5432}:5432"
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
-    - ./db:/docker-entrypoint-initdb.d:ro
-  healthcheck:
-    test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-    interval: 10s
-    timeout: 5s
-    retries: 5
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: studyfuel_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-studyfuel}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d:ro
+      
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -45,7 +46,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-soundtrack}
+      POSTGRES_DB: ${POSTGRES_DB:-studyfuel}
       REDIS_HOST: redis
     volumes:
       - ./backend:/app
@@ -65,6 +66,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    env_file:
+      - ./frontend/src/.env.local
     environment:
       BACKEND_INTERNAL_URL: http://backend:8000
       NEXT_PUBLIC_API_URL: http://localhost:8000
